@@ -1,0 +1,33 @@
+[user]
+	name = Rachel Singh
+	email = rsingh@smartsheet.com
+[push]
+	default = current
+[core]
+	autocrlf = input
+[alias]
+	hist = log --graph --pretty=format:"%C(yellow)%h\\ %Cgreen%ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+	cfiles = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	graph = log --all --decorate --oneline --graph
+[diff]
+	tool = winmerge
+[difftool "winmerge"]
+	name = WinMerge
+	trustExitCode = true
+	prompt = false
+	cmd = "'C:/Program Files (x86)/WinMerge/WinMergeU.exe'" -u -e "$LOCAL" "$REMOTE"
+[mergetool]
+	prompt = false
+	keepBackup = false
+	keepTemporaries = false
+[merge]
+	tool = winmerge
+[mergetool "winmerge"]
+	name = WinMerge
+	trustExitCode = true
+	cmd = "'C:/Program Files (x86)/WinMerge/WinMergeU.exe'" -u -e dl "Local" -dr "Remote" $LOCAL $REMOTE $MERGED
+[credential]
+	helper = wincred
+	modalprompt = true
+[help]
+	autocorrect = 1
