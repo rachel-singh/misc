@@ -1,0 +1,114 @@
+
+<h2 class="sr-only">Azure to AWS services mapping table with category filter and search</h2>
+<style>
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.filter-bar select{font-size:13px}
+.filter-bar input{flex:1;min-width:180px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:0.03em}
+td{padding:8px 10px;border-bottom:0.5px solid var(--border);color:var(--text-primary);vertical-align:top}
+tr.hidden{display:none}
+col.cat{width:18%}col.svc{width:41%}
+.cat-pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:var(--radius);font-weight:500}
+.cat-compute .cat-pill{background:var(--bg-accent);color:var(--text-accent)}
+.cat-storage .cat-pill{background:var(--bg-success);color:var(--text-success)}
+.cat-database .cat-pill{background:var(--bg-pro);color:var(--text-pro)}
+.cat-networking .cat-pill{background:#E1F5EE;color:#0F6E56}
+.cat-security .cat-pill{background:var(--bg-danger);color:var(--text-danger)}
+.cat-analytics .cat-pill{background:var(--bg-warning);color:var(--text-warning)}
+.cat-messaging .cat-pill{background:#FAECE7;color:#993C1D}
+.cat-devops .cat-pill{background:#EEEDFE;color:#534AB7}
+.cat-aiml .cat-pill{background:#FBEAF0;color:#993556}
+.cat-other .cat-pill{background:var(--surface-1);color:var(--text-secondary)}
+.count{font-size:12px;color:var(--text-muted);margin-left:auto;white-space:nowrap}
+</style>
+<div class="filter-bar">
+<select id="catFilter"><option value="all">All categories</option></select>
+<input type="text" id="search" placeholder="Search services..." />
+<span class="count" id="count"></span>
+</div>
+<table>
+<colgroup><col class="cat"><col class="svc"><col class="svc"></colgroup>
+<thead><tr><th>Category</th><th>Azure</th><th>AWS</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+<script>
+const data=[
+["Compute","Azure Virtual Machines","EC2"],
+["Compute","Azure Functions","Lambda"],
+["Compute","Azure Container Instances","Fargate"],
+["Compute","AKS","EKS"],
+["Compute","Azure App Service","Elastic Beanstalk / App Runner"],
+["Compute","Azure Batch","AWS Batch"],
+["Storage","Blob Storage","S3"],
+["Storage","Azure Files","EFS"],
+["Storage","Managed Disks","EBS"],
+["Storage","Azure Data Lake Storage Gen2","S3 + Lake Formation"],
+["Storage","Archive Storage","S3 Glacier"],
+["Database","Azure SQL","RDS (SQL Server) / Aurora"],
+["Database","Cosmos DB","DynamoDB / Neptune (graph)"],
+["Database","Azure Database for MySQL/PostgreSQL","RDS / Aurora"],
+["Database","Azure Cache for Redis","ElastiCache"],
+["Database","Azure Synapse (SQL pools)","Redshift"],
+["Networking","Azure VNet","VPC"],
+["Networking","Azure Load Balancer","NLB"],
+["Networking","Application Gateway","ALB"],
+["Networking","Azure Front Door","CloudFront"],
+["Networking","Azure DNS","Route 53"],
+["Networking","ExpressRoute","Direct Connect"],
+["Networking","Azure Firewall","Network Firewall"],
+["Security","Entra ID (Azure AD)","IAM Identity Center / Cognito"],
+["Security","Azure Key Vault","Secrets Manager / KMS"],
+["Security","Microsoft Defender for Cloud","Security Hub / GuardDuty"],
+["Analytics","Azure Databricks","AWS Databricks"],
+["Analytics","Azure Data Factory","Glue"],
+["Analytics","Azure Stream Analytics","Kinesis Data Analytics"],
+["Analytics","Azure Event Hubs","Kinesis Data Streams"],
+["Analytics","Azure HDInsight","EMR"],
+["Analytics","Power BI","QuickSight"],
+["Analytics","Azure Purview","DataZone / Lake Formation"],
+["Messaging","Azure Service Bus","SQS / SNS"],
+["Messaging","Azure Event Grid","EventBridge"],
+["Messaging","Azure Logic Apps","Step Functions"],
+["Messaging","Azure API Management","API Gateway"],
+["DevOps","Azure DevOps","CodePipeline / CodeBuild / CodeDeploy"],
+["DevOps","Azure Monitor","CloudWatch"],
+["DevOps","Application Insights","X-Ray"],
+["DevOps","Azure Container Registry","ECR"],
+["AI / ML","Azure OpenAI Service","Bedrock"],
+["AI / ML","Azure ML","SageMaker"],
+["AI / ML","Azure Cognitive Services","Rekognition / Comprehend / Polly / Translate"],
+["Other","Cosmos DB Change Feed","DynamoDB Streams"],
+["Other","Azure SignalR","AppSync (WebSockets) / IoT Core"],
+["Other","Bicep / ARM Templates","CloudFormation / CDK"]
+];
+const catClass=c=>c.toLowerCase().replace(/[^a-z]/g,'').replace('aiml','aiml');
+const cats=[...new Set(data.map(r=>r[0]))];
+const sel=document.getElementById('catFilter');
+cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+const tbody=document.getElementById('tbody');
+data.forEach(([cat,az,aws])=>{
+const tr=document.createElement('tr');
+const cls='cat-'+catClass(cat);
+tr.className=cls;
+tr.dataset.cat=cat;
+tr.dataset.text=(az+' '+aws).toLowerCase();
+tr.innerHTML=`<td><span class="cat-pill">${cat}</span></td><td>${az}</td><td>${aws}</td>`;
+tbody.appendChild(tr);
+});
+const countEl=document.getElementById('count');
+function filter(){
+const cat=sel.value;
+const q=document.getElementById('search').value.toLowerCase();
+let n=0;
+tbody.querySelectorAll('tr').forEach(tr=>{
+const show=(cat==='all'||tr.dataset.cat===cat)&&(!q||tr.dataset.text.includes(q));
+tr.classList.toggle('hidden',!show);
+if(show)n++;
+});
+countEl.textContent=n+' of '+data.length+' services';
+}
+sel.addEventListener('change',filter);
+document.getElementById('search').addEventListener('input',filter);
+filter();
+</script>
